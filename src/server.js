@@ -1,13 +1,12 @@
 const express = require('express');
 const { connectToDb, getDb } = require('./db')
 const { ObjectId } = require('mongodb');
+const {successResponder, errorResponder} = require('./utils/responder')
 const app = express(),
     PORT = 2001;
-
 // let bookedsit
 let db
-connectToDb(function (err) {
-
+connectToDb( function (err) {
     if (!err) {
         app.listen(PORT, () => {
             console.log(`app is listening on port ${PORT}`)
@@ -15,21 +14,20 @@ connectToDb(function (err) {
         db = getDb()
     }
 })
-
 app.use(express.json());
 
 //get  available bus with passengers less than 16
 app.get('/bus', async(request, response) => {
     const {origin, destination} = request.body
-    const payload = {origin, destination}
 
- const bus =  await db.collection('buses').findOne({ origin: origin, destination: destination })
+
+ const bus =  await db.collection('buses').findOne({ origin, destination })
  console.log(bus)
  if (bus.reservations.length <= 15) {
-     response.json(bus)
+    return successResponder(response, bus)
  }
  else{
-     response.json("bus to specified destination is currently not available" )
+    return errorResponder(response, 404, 'bus to specified destination is currently not available')
  }
 })
 
@@ -37,19 +35,11 @@ app.get('/bus', async(request, response) => {
 app.post('/register', async(request, response) => {
     const { firstName, lastName, gender, age, phoneNumber } = request.body
     if (!firstName || !lastName || !gender || !age || !phoneNumber) {
-        response.status(400).json({
-            error: true,
-            description: 'please enter all required personal details'
-        })
+       return errorResponder(response, 400, 'enter in all required personal details')
     }
-   
-   
     const payload = { firstName, lastName, gender, age, phoneNumber };
     const result =  await db.collection('passengers').insertOne(payload)
-    console.log(result)
-       response.json(result) 
-    
-
+       return successResponder(response, result)
 })
 // create resrvations/ book bus
 app.post('/reservation',async  (request, response) => {
@@ -57,41 +47,23 @@ app.post('/reservation',async  (request, response) => {
     const payload = { passengerId, busId, origin, destination, phoneNumber }
 
     //check to see if user passed in all required details
-    if (!passengerId || !busId || !origin || !destination || !phoneNumber) {
-        response.status(400).json({
-            error: true,
-            description: 'please enter all required details'
-        })
+    if (!passengerId || !busId || !origin || !destination || !phoneNumber){
+    return errorResponder(response, 404, 'please pass in all required personal details')
     }
 //    find and make reservations in the available bus
     const bus = await db.collection('buses').findOne( { _id: new ObjectId(busId)});
     if (bus === null) {
-        response.status(404).json(
-            {
-                err: true,
-                description: 'bus not found'
-            }
-        )
-        return
+        return errorResponder(response, 404, 'bus not found')
     }
     if (bus.reservations.length <= 15) {
     const newReservation = await db.collection('reservations').insertOne(payload)
     const booking = await db.collection('buses').updateOne( { _id : new ObjectId(busId) },
       { $push:{ reservations : newReservation.insertedId } })
-    response.json({
-        error: false,
-        description: 'reservation added'
-    })  
-    
+    return successResponder(response, booking, 'reservation added')
     }
     else {
-        response.status(400).json({
-            error: true,
-            description: "bus is full"
-
-        })
+        return errorResponder(response, 400, 'bus is full')
     }
-    
 })
 // check number of seats left in available bus
 app.get('/reservationStatus',async (request, response) => {
@@ -100,10 +72,10 @@ const bus = await db.collection('buses').findOne({ _id : new ObjectId(busId) })
 console.log(busId)
 console.log(bus)
 if (bus !== null) {
-    response.json(`${16 - bus.reservations.length} seats are available in this bus`)
+    return successResponder(response, bus, `${16 - bus.reservations.length} seats are available in this bus`)
 }
 else{
-    response.status(400).json('bus not found')
+    return errorResponder(response, 404, 'bus not found')
 }
 })
 
@@ -112,11 +84,7 @@ app.delete('/cancelRide', async(request, response) => {
     const {passengerId, busId, reservationId} = request.body
      
     if (!passengerId || !busId || !reservationId) {
-        response.status(400).json({
-            error: true,
-            description: 'please enter all required details'
-        })
-        return;
+        return errorResponder(response, 404, 'enter all required details')
     }
 const reservation = await db.collection('reservations').findOne({_id: new ObjectId(reservationId)})
 console.log(reservation)
@@ -124,15 +92,9 @@ if (reservation !== null) {
    const cancelReservation = await db.collection('reservations').deleteOne(reservation)
    const cancelbooking = await db.collection('buses').updateOne({ _id : new ObjectId(busId) },
    { $pull :{ reservations : reservation._id } })
-   response.json({
-    error: false,
-    description: 'booking cancelled'
-   })
+return successResponder(response, payload, 'booking cancelled')
 }
 else{
-    response.status(404).json({
-        error: true,
-        description:'could not find reservation details'
-    })
+    return errorResponder(response, 404, 'could not find reservation details')
 }
  })
