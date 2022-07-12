@@ -1,16 +1,9 @@
-const { connectToDb, getDb } = require('../model/db')
+const database= require('../model/db')
 const { successResponder, errorResponder } = require('../utils/responder')
+const route = require('../routes/reservationStatus')
 
-let db
-connectToDb(function (err) {
-    if (!err) {
-        app.listen(PORT, () => {
-            console.log(`app is listening on port ${PORT}`)
-        })
-        db = getDb()
-    }
-})
 const busStatus = async (request, response) => {
+    const db = await database.connectToDb()
     const busId = request.body.busId
     const bus = await db
         .collection('buses')

@@ -1,18 +1,14 @@
-const { MongoClient } = require('mongodb')
+const {MongoClient} = require('mongodb')
 
-let dbConnection
+const connectToDb = async ()=>{
+    try {
+        const client = await MongoClient.connect('mongodb://localhost:27017/')
 
+        return client.db('sunriseTrips')
+    }catch (error){
+        console.log(error, 'database error')
+    }
+}
 module.exports = {
-    connectToDb: (cb) => {
-        MongoClient.connect('mongodb://localhost:27017/sunriseTrips')
-        .then( (client) => {
-         dbConnection = client.db()
-        cb()
-        })
-        .catch(err => {
-            console.log(err)
-            cb()
-        })
-    },
-    getDb: () => dbConnection
+    connectToDb
 }

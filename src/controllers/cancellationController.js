@@ -1,25 +1,19 @@
-const { connectToDb, getDb } = require('../model/db')
+const database = require('../model/db')
 const { successResponder, errorResponder } = require('../utils/responder')
-let db
-connectToDb(function (err) {
-    if (!err) {
-        app.listen(PORT, () => {
-            console.log(`app is listening on port ${PORT}`)
-        })
-        db = getDb()
-    }
-})
-cancelRide = async (request, response) => {
+// const route = require('../routes/cancelReservation')
+
+const cancelBooking = async (request, response) => {
+    const dbConnection = await database.connectToDb()
     const { passengerId, busId, reservationId } = request.body
-    const reservation = await db
+    const reservation = await dbConnection
         .collection('reservations')
         .findOne({ _id: new ObjectId(reservationId) })
     console.log(reservation)
     if (reservation !== null) {
-        const cancelReservation = await db
+        const cancelReservation = await dbConnection
             .collection('reservations')
             .deleteOne(reservation)
-        const cancelbooking = await db
+        const cancelbooking = await dbConnection
             .collection('buses')
             .updateOne(
                 { _id: new ObjectId(busId) },
@@ -33,4 +27,7 @@ cancelRide = async (request, response) => {
             'could not find reservation details'
         )
     }
+}
+module.exports = {
+    cancelBooking
 }

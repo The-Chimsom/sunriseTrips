@@ -4,3 +4,5 @@ const controller = require('../controllers/busController')
 const middleware = require('../middlewares/busMiddleware')
 
 router.get('/bus', controller.getAvailableBus, middleware.busValidation)
+
+module.exports = router

@@ -1,6 +1,6 @@
 
 const Joi = require('joi');
-const requiredDetails = async function  (request, response, next){
+const userDetailsValidation = async function  (request, response, next){
 try { 
      const schema = Joi.object({
         passengerId: Joi.string()
@@ -19,6 +19,7 @@ try {
     })
   const data = request.body
   userDetails = await schema.validateAsync({...data})
+  request.body = userDetails
   next()
 }
  catch(error) {
@@ -26,5 +27,5 @@ try {
     }
 }
 module.exports = {
-    requiredDetails
+    userDetailsValidation
 }

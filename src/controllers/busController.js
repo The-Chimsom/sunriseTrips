@@ -1,19 +1,12 @@
-const { connectToDb, getDb } = require('../model/db')
+const database = require('../model/db')
 const { successResponder, errorResponder } = require('../utils/responder')
 const route = require('../routes/bus')
 
-let db
-connectToDb(function (err) {
-    if (!err) {
-        app.listen(PORT, () => {
-            console.log(`app is listening on port ${PORT}`)
-        })
-        db = getDb()
-    }
-})
 const getAvailableBus = async (request, response) => {
+    try {
+        const dbConnection = await database.connectToDb()
     const { origin, destination } = request.body
-    const bus = await db.collection('buses').findOne({ origin, destination })
+    const bus = await dbConnection.collection('buses').findOne({ origin, destination })
     if (!bus || bus.reservations.length >= 15) {
         errorResponder(
             response,
@@ -23,7 +16,11 @@ const getAvailableBus = async (request, response) => {
     }
     console.log(bus)
     if (bus.reservations.length <= 15) {
-        return successResponder(response, bus)
+        return successResponder(response, bus, 'bus accessed')
+    }
+}
+    catch (error){
+console.log(error)
     }
 }
 module.exports = {

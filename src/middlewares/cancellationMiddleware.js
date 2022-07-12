@@ -1,5 +1,5 @@
 const Joi = require('joi')
-const passengerDetails = async function (request, response, next) {
+const passengerDetailsValidation = async function (request, response, next) {
     try {
         const schema = Joi.object({
             passengerId: Joi.string().alphanum().trim().required(),
@@ -15,5 +15,5 @@ const passengerDetails = async function (request, response, next) {
     }
 }
 module.exports = {
-    passengerDetails,
+    passengerDetailsValidation
 }
