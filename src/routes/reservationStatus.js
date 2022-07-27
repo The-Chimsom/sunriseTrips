@@ -3,5 +3,9 @@ const router = express.Router()
 const controller = require('../controllers/statusControllers')
 const middleware = require('../middlewares/statusMiddleware')
 
-router.get('/reservationStatus', controller.busStatus, middleware.busDetailValidation)
+router.get(
+    '/reservationStatus',
+    middleware.busDetailValidation,
+    controller.busStatus
+)
 module.exports = router
