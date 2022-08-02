@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/cancellationController');
-const middleware = require('../middlewares/cancellationMiddleware');
+const cancellationSchema = require('../middlewares/cancellationSchema');
+const validateSchema = require('../middlewares/validateSchema')
 
 router.delete(
     '/cancelRide',
-    middleware.passengerDetailsValidation,
+    validateSchema(cancellationSchema),
     controller.cancelBooking
 )
 module.exports = router

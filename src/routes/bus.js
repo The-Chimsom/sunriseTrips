@@ -1,8 +1,9 @@
 const express = require('express')
 const router = express.Router()
 const controller = require('../controllers/busController')
-const middleware = require('../middlewares/busMiddleware')
+const busSchema = require('../middlewares/bus.schema')
+const validateSchema = require('../middlewares/validateSchema')
 
-router.get('/bus', middleware.busValidation, controller.getAvailableBus)
+router.get('/bus', validateSchema(busSchema), controller.getAvailableBus)
 
 module.exports = router

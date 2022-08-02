@@ -1,11 +1,11 @@
 const express = require('express')
 const router = express.Router()
 const controller = require('../controllers/statusControllers')
-const middleware = require('../middlewares/statusMiddleware')
-
+const statusSchema = require('../middlewares/statusSchema')
+const validateSchema = require('../middlewares/validateSchema')
 router.get(
     '/reservationStatus',
-    middleware.busDetailValidation,
+    validateSchema(statusSchema),
     controller.busStatus
 )
 module.exports = router

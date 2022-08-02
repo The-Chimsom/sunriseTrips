@@ -1,8 +1,5 @@
-
 const Joi = require('joi');
-const userDetailsValidation = async function  (request, response, next){
-try { 
-     const schema = Joi.object({
+     const reservationSchema = Joi.object({
         passengerId: Joi.string()
         .alphanum()
         .required(),
@@ -17,15 +14,6 @@ try {
         .required()
        
     })
-  const data = request.body
-  userDetails = await schema.validateAsync({...data})
-  request.body = userDetails
-  next()
-}
- catch(error) {
-    console.log(error)
-    }
-}
 module.exports = {
-    userDetailsValidation
+    reservationSchema
 }

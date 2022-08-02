@@ -1,6 +1,5 @@
-const database= require('../model/db')
+const database = require('../model/db')
 const { successResponder, errorResponder } = require('../utils/responder')
-const route = require('../routes/reservationStatus')
 
 const busStatus = async (request, response) => {
     const db = await database.connectToDb()
@@ -21,5 +20,5 @@ const busStatus = async (request, response) => {
     }
 }
 module.exports = {
-    busStatus
+    busStatus,
 }
