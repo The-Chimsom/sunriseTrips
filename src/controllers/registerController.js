@@ -6,28 +6,28 @@ const jwt = require('jsonwebtoken')
 require('dotenv').config()
 
 const registerUser = async (request, response) => {
-    const dbConnection = await database.connectToDb()
+    const mongoDbInstance = request.app.locals.mongoDbInstance
     const { firstName, lastName, gender, age, phoneNumber } = request.body
-    const passenger = await dbConnection
+    const passenger = await mongoDbInstance
         .collection('passengers')
         .findOne({ phoneNumber })
     if (passenger === null) {
         const payload = { firstName, lastName, gender, age, phoneNumber }
-        const result = await dbConnection
+        const result = await mongoDbInstance
             .collection('passengers')
             .insertOne(payload)
         return successResponder(response, result)
     } else {
-        errorResponder(response, 404, 'passenger already exists')
+        errorResponder(response, 401, 'passenger already exists')
     }
 }
 const signUp = async (request, response) => {
-    const dbConnection = await database.connectToDb()
+    const mongoDbInstance = request.app.locals.mongoDbInstance
     const { firstName, lastName, email, password, phoneNumber } = request.body
     const hash = await argon2.hash(password, {
         type: argon2.argon2id,
     })
-    const emailAddress = await dbConnection
+    const emailAddress = await mongoDbInstance
         .collection('users')
         .findOne({ email })
 
@@ -35,10 +35,10 @@ const signUp = async (request, response) => {
         return errorResponder(
             response,
             400,
-            'user with this email alrewdy exists'
+            'user with this email already exists'
         )
     }
-    const user = await dbConnection
+    const user = await mongoDbInstance
         .collection('users')
         .insertOne({ firstName, lastName, email, password: hash, phoneNumber })
     const userId = String(user.insertedId)
@@ -50,7 +50,7 @@ const signUp = async (request, response) => {
 }
 
 const login = async (request, response) => {
-    const dbConnection = await database.connectToDb()
+    const dbConnection = request.app.locals.mongoDbInstance
     const { email, password } = request.body
     const checkUser = await dbConnection.collection('users').findOne({ email })
     if (!checkUser) {

@@ -3,22 +3,22 @@ const { successResponder, errorResponder } = require('../utils/responder')
 const route = require('../routes/reservation')
 
 const createReservation = async (request, response) => {
-    const dbConnection = await database.connectToDb()
+    const mongoDbInstance = request.app.locals.mongoDbInstance
     const { passengerId, busId, origin, destination, phoneNumber } =
         request.body
     const payload = { passengerId, busId, origin, destination, phoneNumber }
     //    find and make reservations in the available bus
-    const bus = await dbConnection
+    const bus = await mongoDbInstance
         .collection('buses')
         .findOne({ _id: new ObjectId(busId) })
     if (bus === null) {
         return errorResponder(response, 404, 'bus not found')
     }
     if (bus.reservations.length <= 15) {
-        const newReservation = await dbConnection
+        const newReservation = await mongoDbInstance
             .collection('reservations')
             .insertOne(payload)
-        const booking = await dbConnection
+        const booking = await mongoDbInstance
             .collection('buses')
             .updateOne(
                 { _id: new ObjectId(busId) },
