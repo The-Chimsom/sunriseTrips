@@ -1,10 +1,11 @@
-const express = require('express');
+const { connectToDb } = require('./model/db');
 const server = require('./server');
 
-(function (expressInstance) {
+(async function (app) {
     const PORT = 2001
-    console.log(PORT)
-    expressInstance.listen(PORT, () => {
+    const mongoClient = await connectToDb();
+    app.locals.mongoDbInstance = mongoClient;
+    app.listen(PORT, () => {
         console.log(`server running on port ${PORT}`)
     })
 })(server)

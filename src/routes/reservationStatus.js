@@ -4,7 +4,7 @@ const controller = require('../controllers/statusControllers')
 const statusSchema = require('../middlewares/statusSchema')
 const validateSchema = require('../middlewares/validateSchema')
 router.get(
-    '/reservationStatus',
+    '/reservation',
     validateSchema(statusSchema),
     controller.busStatus
 )
