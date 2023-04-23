@@ -1,6 +1,6 @@
 const database = require('../model/db')
 const { successResponder, errorResponder } = require('../utils/responder')
-const route = require('../routes/registration')
+const AuthMongoService = require('./auth.service')
 const argon2 = require('argon2')
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
@@ -23,24 +23,28 @@ const registerUser = async (request, response) => {
 }
 const signUp = async (request, response) => {
     const mongoDbInstance = request.app.locals.mongoDbInstance
-    const { firstName, lastName, email, password, phoneNumber } = request.body
-    const hash = await argon2.hash(password, {
-        type: argon2.argon2id,
-    })
-    const emailAddress = await mongoDbInstance
-        .collection('users')
-        .findOne({ email })
+    const authMongoService = new AuthMongoService(mongoDbInstance)
+    const payload = { ...request.body}
+    
+    const hashedPassword = await authMongoService.hashpassword(payload.password)
+    const userCheck = await authMongoService.checkUser(payload.email)
+    // const emailAddress = await mongoDbInstance
+    //     .collection('users')
+    //     .findOne({ email })
 
-    if (emailAddress) {
+    if (userCheck) {
         return errorResponder(
             response,
             400,
             'user with this email already exists'
         )
     }
-    const user = await mongoDbInstance
-        .collection('users')
-        .insertOne({ firstName, lastName, email, password: hash, phoneNumber })
+    // const user = await mongoDbInstance
+    //     .collection('users')
+    //     .insertOne({ firstName, lastName, email, password: hash, phoneNumber })
+
+    const user = await authMongoService.saveCredentials({...payload});
+
     const userId = String(user.insertedId)
     const token = jwt.sign({ userId }, 'top_secret-20', {
         algorithm: 'HS256',
