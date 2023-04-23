@@ -2,7 +2,6 @@ const database = require('../model/db')
 const { successResponder, errorResponder } = require('../utils/responder')
 const AuthMongoService = require('./auth.service')
 const argon2 = require('argon2')
-const jwt = require('jsonwebtoken')
 require('dotenv').config()
 
 const registerUser = async (request, response) => {
@@ -28,9 +27,6 @@ const signUp = async (request, response) => {
     
     const hashedPassword = await authMongoService.hashpassword(payload.password)
     const userCheck = await authMongoService.checkUser(payload.email)
-    // const emailAddress = await mongoDbInstance
-    //     .collection('users')
-    //     .findOne({ email })
 
     if (userCheck) {
         return errorResponder(
@@ -39,17 +35,12 @@ const signUp = async (request, response) => {
             'user with this email already exists'
         )
     }
-    // const user = await mongoDbInstance
-    //     .collection('users')
-    //     .insertOne({ firstName, lastName, email, password: hash, phoneNumber })
 
-    const user = await authMongoService.saveCredentials({...payload});
+    const {userId,token} = await authMongoService.saveCredentials({...payload});
+    // const userId = String(user.insertedId)
 
-    const userId = String(user.insertedId)
-    const token = jwt.sign({ userId }, 'top_secret-20', {
-        algorithm: 'HS256',
-        expiresIn: '2h',
-    })
+    // const jwt = await authMongoService.createJWT(userId)
+    
     return successResponder(response, { userId, token })
 }
 
