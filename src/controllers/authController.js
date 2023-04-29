@@ -37,34 +37,25 @@ const signUp = async (request, response) => {
     }
 
     const {userId,token} = await authMongoService.saveCredentials({...payload});
-    // const userId = String(user.insertedId)
-
-    // const jwt = await authMongoService.createJWT(userId)
     
     return successResponder(response, { userId, token })
 }
 
 const login = async (request, response) => {
     const dbConnection = request.app.locals.mongoDbInstance
-    const { email, password } = request.body
-    const checkUser = await dbConnection.collection('users').findOne({ email })
+    const authMongoService = new AuthMongoService(mongoDbInstance)
+     const payload = { ...request.body }
+    const checkUser = await authMongoService.checkUser(payload.email)
     if (!checkUser) {
         return errorResponder(response, 404, 'user does not exists')
     }
     const userId = String(user.insertedId)
-    const token = jwt.sign({ userId }, process.env.ACCESS_TOP_TOKEN_SECRET, {
-        algorithm: 'HS256',
-        expiresIn: '2h',
-    })
+    const token = await authMongoService.createJWT(userId)
     return successResponder(response, { userId, token })
 }
 
-const logout = async (request, response) =>{
-    
-}
 module.exports = {
     registerUser,
     signUp,
-    login,
-    logout
+    login
 }
