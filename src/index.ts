@@ -1,4 +1,4 @@
-const { connectToDb } = require('./model/db');
+import { connectToDb } from './model/db';
 const server = require('./server');
 
 (async function (app) {

@@ -1,6 +1,6 @@
 const { MongoClient } = require('mongodb')
 
-const connectToDb = async () => {
+export const connectToDb = async () => {
     try {
         const client = await MongoClient.connect('mongodb://localhost:27017/')
 
@@ -9,6 +9,4 @@ const connectToDb = async () => {
         console.log(error, 'database error')
     }
 }
-module.exports = {
-    connectToDb
-}
+

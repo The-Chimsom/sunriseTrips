@@ -1,7 +1,7 @@
-const database = require('../model/db')
+import { Request } from "express"
 const { successResponder, errorResponder } = require('../utils/responder')
 
-const getAvailableBus = async (request, response) => {
+export const getAvailableBus = async (request: Request, response: Request) => {
     try {
          const mongoDbInstance = request.app.locals.mongoDbInstance
     const { origin, destination } = request.body
@@ -24,6 +24,4 @@ const getAvailableBus = async (request, response) => {
 console.log(error)
     }
 }
-module.exports = {
-    getAvailableBus
-}
+

@@ -1,9 +1,11 @@
-const { ObjectId } = require('mongodb')
-const database = require('../model/db')
+import { Request, Response } from "express"
+
+import { ObjectId } from 'mongodb'
+import {connectToDb} from '../model/db'
 const { successResponder, errorResponder } = require('../utils/responder')
 
-const busStatus = async (request, response) => {
-    const db = await database.connectToDb()
+export const busStatus = async (request: Request, response:Response) => {
+    const db = await connectToDb()
     const busId = request.body.busId
     const bus = await db
         .collection('buses')

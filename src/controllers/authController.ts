@@ -1,10 +1,10 @@
-const database = require('../model/db')
+import { Request, Response } from 'express'
+
 const { successResponder, errorResponder } = require('../utils/responder')
 const AuthMongoService = require('./auth.service')
-const argon2 = require('argon2')
 require('dotenv').config()
 
-const registerUser = async (request, response) => {
+export const registerUser = async (request: Request, response: Request) => {
     const mongoDbInstance = request.app.locals.mongoDbInstance
     const { firstName, lastName, gender, age, phoneNumber } = request.body
     const passenger = await mongoDbInstance
@@ -20,12 +20,12 @@ const registerUser = async (request, response) => {
         errorResponder(response, 401, 'passenger already exists')
     }
 }
-const signUp = async (request, response) => {
+
+export const signUp = async (request: Request, response: Response) => {
     const mongoDbInstance = request.app.locals.mongoDbInstance
     const authMongoService = new AuthMongoService(mongoDbInstance)
-    const payload = { ...request.body}
-    
-    const hashedPassword = await authMongoService.hashpassword(payload.password)
+    const payload = { ...request.body }
+
     const userCheck = await authMongoService.checkUser(payload.email)
 
     if (userCheck) {
@@ -36,26 +36,22 @@ const signUp = async (request, response) => {
         )
     }
 
-    const {userId,token} = await authMongoService.saveCredentials({...payload});
-    
+    const { userId, token } = await authMongoService.saveCredentials({
+        ...payload,
+    })
+
     return successResponder(response, { userId, token })
 }
 
-const login = async (request, response) => {
+export const login = async (request: Request, response: Response) => {
     const dbConnection = request.app.locals.mongoDbInstance
-    const authMongoService = new AuthMongoService(mongoDbInstance)
-     const payload = { ...request.body }
+    const authMongoService = new AuthMongoService(dbConnection)
+    const payload = { ...request.body }
     const checkUser = await authMongoService.checkUser(payload.email)
     if (!checkUser) {
         return errorResponder(response, 404, 'user does not exists')
     }
-    const userId = String(user.insertedId)
+    const userId = String(checkUser._id)
     const token = await authMongoService.createJWT(userId)
     return successResponder(response, { userId, token })
-}
-
-module.exports = {
-    registerUser,
-    signUp,
-    login
 }

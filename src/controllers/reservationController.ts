@@ -1,8 +1,9 @@
-const database = require('../model/db')
-const { successResponder, errorResponder } = require('../utils/responder')
-const route = require('../routes/reservation')
+import { Request, Response } from "express"
+import { ObjectId } from "mongodb"
 
-const createReservation = async (request, response) => {
+const { successResponder, errorResponder } = require('../utils/responder')
+
+export const createReservation = async (request: Request, response: Response) => {
     const mongoDbInstance = request.app.locals.mongoDbInstance
     const { passengerId, busId, origin, destination, phoneNumber } =
         request.body
@@ -28,7 +29,4 @@ const createReservation = async (request, response) => {
     } else {
         return errorResponder(response, 400, 'bus is full')
     }
-}
-module.exports = {
-    createReservation
 }
