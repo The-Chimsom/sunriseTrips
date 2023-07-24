@@ -4,9 +4,10 @@
   "description": "",
   "main": "server.js",
   "scripts": {
+    "prebuild": "rimraf build",
     "build": "tsc -b",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon ./build/index.js"
+    "start": "npm run build && nodemon ./build/index.js"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +20,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.6.0",
     "nodemon": "^2.0.16",
+    "rimraf": "^5.0.1",
     "yup": "^0.32.11"
   },
   "devDependencies": {
