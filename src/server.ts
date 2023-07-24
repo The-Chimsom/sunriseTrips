@@ -1,18 +1,16 @@
-const express = require('express')
-const busRoute = require('./routes/bus')
-const cancelRoute = require('./routes/cancelReservation')
-const registrationRoute = require('./routes/registration')
-const reservationRoute = require('./routes/reservation')
-const statusRoute = require('./routes/reservationStatus')
+import express from "express"
+import { busRouter } from "./routes/bus"
+import { cancelReservationRouter } from "./routes/cancelReservation"
+import { registrationRouter } from "./routes/registration"
+import { reservarionStatusRouter } from "./routes/reservationStatus"
 
 
-const server = express()
+
+export const server = express()
 
 server.use(express.json())
-server.use('/available', busRoute)
-server.use('/cancel', cancelRoute)
-server.use('/user/access', registrationRoute)
-server.use('/booking', reservationRoute)
-server.use('/availableSeats', statusRoute)
-server.use('/user', registrationRoute)
-module.exports = server
+server.use('/available', busRouter)
+server.use('/cancel', cancelReservationRouter)
+server.use('/user/access', registrationRouter)
+server.use('/booking', reservarionStatusRouter)
+server.use('/availableSeats', reservarionStatusRouter)

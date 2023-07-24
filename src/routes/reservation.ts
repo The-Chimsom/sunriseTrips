@@ -3,7 +3,6 @@ import { createReservation } from '../controllers/reservationController'
 import {reservationSchema} from '../middlewares/reservationSchema'
 import {validateSchema} from '../middlewares/validateSchema'
 
-const router = Router()
+export const reservationRouter = Router()
 
-router.post('/reservation', validateSchema(reservationSchema), createReservation )
-module.exports = router
+reservationRouter.post('/reservation', validateSchema(reservationSchema), createReservation )

@@ -3,6 +3,6 @@ import  { Router } from 'express'
 import {busSchema} from '../middlewares/bus.schema'
 import {validateSchema } from '../middlewares/validateSchema'
 
-export const busrouter = Router()
+export const busRouter = Router()
 
-busrouter.get('/bus', validateSchema(busSchema), getAvailableBus)
+busRouter.get('/bus', validateSchema(busSchema), getAvailableBus)
