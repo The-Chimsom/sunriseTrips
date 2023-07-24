@@ -1,9 +1,7 @@
 import { Request } from "express"
-
-const database = require('../model/db')
 const { successResponder, errorResponder } = require('../utils/responder')
 
-const getAvailableBus = async (request: Request, response: Request) => {
+export const getAvailableBus = async (request: Request, response: Request) => {
     try {
          const mongoDbInstance = request.app.locals.mongoDbInstance
     const { origin, destination } = request.body
@@ -26,6 +24,4 @@ const getAvailableBus = async (request: Request, response: Request) => {
 console.log(error)
     }
 }
-module.exports = {
-    getAvailableBus
-}
+

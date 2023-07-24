@@ -1,7 +1,6 @@
-const joi = require('joi')
+import joi from "joi"
 
-const busSchema = joi.object({
+export const busSchema = joi.object({
     origin: joi.string().required().trim(),
     destination: joi.string().required().trim(),
 })
-module.exports = busSchema

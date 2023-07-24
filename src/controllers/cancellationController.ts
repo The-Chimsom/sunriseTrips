@@ -1,10 +1,10 @@
-const database = require('../model/db')
+import { Request, Response } from "express"
+import { ObjectId } from "mongodb"
 const { successResponder, errorResponder } = require('../utils/responder')
-// const route = require('../routes/cancelReservation')
 
-const cancelBooking = async (request, response) => {
+export const cancelBooking = async (request: Request, response: Response) => {
     const mongoDbInstance = request.app.locals.mongoDbInstance
-    const { passengerId, busId, reservationId } = request.body
+    const { busId, reservationId } = request.body
     const reservation = await mongoDbInstance
         .collection('reservations')
         .findOne({ _id: new ObjectId(reservationId) })
@@ -19,7 +19,7 @@ const cancelBooking = async (request, response) => {
                 { _id: new ObjectId(busId) },
                 { $pull: { reservations: reservation._id } }
             )
-        return successResponder(response, payload, 'booking cancelled')
+        return successResponder(response, cancelbooking, 'booking cancelled')
     } else {
         return errorResponder(
             response,
@@ -28,6 +28,4 @@ const cancelBooking = async (request, response) => {
         )
     }
 }
-module.exports = {
-    cancelBooking
-}
+
