@@ -5,7 +5,7 @@ const { errorResponder } = require('../utils/responder')
 const tokenAuthentication = async (request, response, next) => {
     try {
         const authHeader = request.header.authoriztion
-        const token = authHeader && authHeader.split('')[1]
+        const token = authHeader && authHeader.split(' ')[1]
         if (token === null)
             return errorResponder(response, 401, 'invalid token')
         jwt.verify(token, process.env.ACCESS_TOP_TOKEN_SECRET, (err, user) => {
