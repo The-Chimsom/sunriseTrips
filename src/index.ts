@@ -1,12 +1,16 @@
 import { connectToDb } from './model/db';
-const server = require('./server');
+import {server} from './server';
+import {Express } from 'express'
 
-(async function (app) {
+(async function (app: Express) {
+   try{
     const PORT = 2001
-    const mongoClient = await connectToDb();
+    const mongoClient = await connectToDb();    
     app.locals.mongoDbInstance = mongoClient;
     app.listen(PORT, () => {
         console.log(`server running on port ${PORT}`)
     })
-})(server)
+}catch(error){
+    console.log(error)
+}})(server)
 
