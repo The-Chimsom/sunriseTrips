@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 
 const { successResponder, errorResponder } = require('../utils/responder')
-const AuthMongoService = require('./auth.service')
+import { AuthMongoService } from './auth.service'
 require('dotenv').config()
 
 export const registerUser = async (request: Request, response: Request) => {
@@ -44,14 +44,18 @@ export const signUp = async (request: Request, response: Response) => {
 }
 
 export const login = async (request: Request, response: Response) => {
-    const dbConnection = request.app.locals.mongoDbInstance
-    const authMongoService = new AuthMongoService(dbConnection)
-    const payload = { ...request.body }
-    const checkUser = await authMongoService.checkUser(payload.email)
-    if (!checkUser) {
-        return errorResponder(response, 404, 'user does not exists')
-    }
-    const userId = String(checkUser._id)
-    const token = await authMongoService.createJWT(userId)
-    return successResponder(response, { userId, token })
+    try {
+        const dbConnection = request.app.locals.mongoDbInstance
+        const authMongoService = new AuthMongoService(dbConnection)
+        const payload = { ...request.body }
+        const checkUser = await authMongoService.checkUser(payload.email)
+        if (!checkUser) {
+            return errorResponder(response, 404, 'user does not exists')
+        }
+        const userId = String(checkUser._id)
+        console.log(userId)
+        const token = await authMongoService.createJWT(userId)
+        return successResponder(response, { userId, token })
+    } catch (error) {console.log(error)
+    return errorResponder(response, error)}
 }

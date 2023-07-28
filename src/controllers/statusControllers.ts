@@ -6,9 +6,11 @@ const { successResponder, errorResponder } = require('../utils/responder')
 
 export const busStatus = async (request: Request, response:Response) => {
     const db = await connectToDb()
+    if(!db){
+        throw new Error('database error')
+    }
     const busId = request.body.busId
-    const bus = await db
-        .collection('buses')
+    const bus = await db.collection('buses')
         .findOne({ _id: new ObjectId(busId) })
     console.log(busId)
     console.log(bus)

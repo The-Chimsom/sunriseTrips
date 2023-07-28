@@ -1,10 +1,12 @@
 import { Collection, Db, Document, Filter } from "mongodb"
+import 'dotenv/config'
 
-const jwt = require('jsonwebtoken')
+
+import jwt from 'jsonwebtoken'
 const argon2 = require('argon2')
 
-class AuthMongoService {
-    userCollection: Collection;
+export class AuthMongoService {
+    userCollection: Collection
 
     constructor(mongoDbInstance: Db) {
         this.userCollection = mongoDbInstance.collection('USERS')
@@ -13,6 +15,14 @@ class AuthMongoService {
     async checkUser(email: string) {
         const user = this.userCollection.findOne({ email })
         return user
+    }
+
+    async createJWT(userId: string) {
+        const token = jwt.sign({userId}, 'TOP SECRET', {
+            algorithm: 'HS256',
+            expiresIn: '1d',
+        })
+        return token
     }
     async saveCredentials(userDetails: Filter<Document>) {
         const details = await this.userCollection.insertOne(userDetails)
@@ -23,12 +33,4 @@ class AuthMongoService {
         const hashedPassword = argon2.hash(password)
         return hashedPassword
     }
-    async createJWT(userId: string) {
-        const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
-            algorithm: process.env.JWT_ALGORITHM,
-            expiresIn: '1d',
-        })
-        return token
-    }
 }
-module.exports = AuthMongoService
